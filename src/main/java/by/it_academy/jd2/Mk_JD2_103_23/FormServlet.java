@@ -9,12 +9,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.TreeSet;
 
 @WebServlet(urlPatterns = "/form_servlet")
 public class FormServlet extends HttpServlet {
     private String NAME_PARAMETER = "name";
-//    private String NAME_PARAMETER_HEADER="ARRAY_NAME_PARAM";
+    //    private String NAME_PARAMETER_HEADER="ARRAY_NAME_PARAM";
+    Musician future = new Musician("future");
+    Musician theWeeknd = new Musician("theWeeknd");
+    Musician vityaAk = new Musician("vityaAk");
+    Musician panzushot = new Musician("panzushot");
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -22,7 +28,34 @@ public class FormServlet extends HttpServlet {
         resp.setContentType("text/plain; charset=utf-8");
 //        resp.setHeader("Content-Type","text/plain; charset=utf-8");
 
+        String musician = req.getParameter("musician");
+
+        switch (musician) {
+            case "future":
+                future.setPoint(future.getPoint() + 1);
+                break;
+            case "theWeeknd":
+                theWeeknd.setPoint(theWeeknd.getPoint() + 1);
+                break;
+            case "vityaAk":
+                vityaAk.setPoint(vityaAk.getPoint() + 1);
+                break;
+            case "panzu":
+                panzushot.setPoint(panzushot.getPoint() + 1);
+                break;
+        }
+
+        TreeSet<Musician> musicians = new TreeSet<>();
+        musicians.add(future);
+        musicians.add(theWeeknd);
+        musicians.add(vityaAk);
+        musicians.add(panzushot);
+
         PrintWriter writer = resp.getWriter();
+        for (Musician m : musicians
+        ) {
+            writer.write(m.toString() + "\n");
+        }
 
 //        Map<String, String[]> params = req.getParameterMap();
 //        StringBuilder builder = new StringBuilder();
@@ -41,11 +74,11 @@ public class FormServlet extends HttpServlet {
 //
 //        writer.write(builder.toString());
 
-        Date now = new Date();
-
-        String musician = req.getParameter("musician");
-        writer.write(musician);
-        writer.write(now.toString());
+//        Date now = new Date();
+//
+//        String musician = req.getParameter("musician");
+//        writer.write(musician);
+//        writer.write(now.toString());
 
 //        with using getHeader()
 //        String header= req.getHeader(NAME_PARAMETER_HEADER);

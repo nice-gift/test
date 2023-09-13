@@ -1,10 +1,10 @@
 package by.it_academy.jd2.Mk_JD2_103_23;
 
-public class Musician implements Comparable<Musician> {
+public class Genre implements Comparable<Genre> {
     private int point;
     private String name;
 
-    public Musician(String name) {
+    public Genre(String name) {
         this.name = name;
     }
 
@@ -21,10 +21,10 @@ public class Musician implements Comparable<Musician> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Musician musician = (Musician) o;
+        Genre genre = (Genre) o;
 
-        if (point != musician.point) return false;
-        return name != null ? name.equals(musician.name) : musician.name == null;
+        if (point != genre.point) return false;
+        return name != null ? name.equals(genre.name) : genre.name == null;
     }
 
     @Override
@@ -35,10 +35,10 @@ public class Musician implements Comparable<Musician> {
     }
 
     @Override
-    public int compareTo(Musician o) {
+    public int compareTo(Genre o) {
         int result = o.point - this.point;
         if (result == 0) {
-            this.name.compareTo(o.name);
+            o.name.compareTo(this.name);
         }
         return result;
     }

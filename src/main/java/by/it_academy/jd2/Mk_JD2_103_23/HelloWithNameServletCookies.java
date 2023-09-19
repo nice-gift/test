@@ -9,40 +9,53 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 @WebServlet(urlPatterns = "/hello_with_name_cookies")
 public class HelloWithNameServletCookies extends HttpServlet {
+    public static final String FIRST_NAME_PARAM_NAME = "firstName";
+    public static final String LAST_NAME_PARAM_NAME = "lastName";
+
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
         req.setCharacterEncoding("utf-8");
         resp.setContentType("text/plain; charset=utf-8");
 
-        String firstName = req.getParameter("firstName");
-        String lastName = req.getParameter("lastName");
+        String firstNameValue = getValueFromAnywhere(req, FIRST_NAME_PARAM_NAME);
+        saveCookies(resp, FIRST_NAME_PARAM_NAME, firstNameValue);
+
+        String lastNameValue = getValueFromAnywhere(req, LAST_NAME_PARAM_NAME);
+        saveCookies(resp, LAST_NAME_PARAM_NAME, lastNameValue);
+
         PrintWriter writer = resp.getWriter();
-        Cookie myCookie;
-        Cookie myCookie2;
+        writer.write("Hello " + firstNameValue + " " + lastNameValue + "!");
+    }
 
-        if (firstName != null && lastName != null) {
-            Cookie[] myCookies = req.getCookies();
-            if (myCookies.length == 0) {
-                writer.write("Ошибка!");
-                return;
-            }
-            myCookie = new Cookie("first", "myCookies[0]");
-            myCookie2 = new Cookie("last", "myCookies[1]");
+    private String getValueFromAnywhere(HttpServletRequest request, String param) {
+        String val = request.getParameter(param);
 
-
-        } else {
-            myCookie = new Cookie("first", "firstName");
-            myCookie2 = new Cookie("last", "lastName");
-            myCookie.setMaxAge(Math.toIntExact(TimeUnit.DAYS.toSeconds(1)));
-            resp.addCookie(myCookie);
-            resp.addCookie(myCookie2);
+        if (val == null) {
+            Cookie[] cookies = request.getCookies();
+            val=Arrays.stream(cookies)
+                    .filter(e -> e.getName().equalsIgnoreCase(param))
+                    .map(Cookie::getValue)
+                    .findFirst()
+                    .orElse(null);
         }
 
+        if (val == null) {
+            throw new IllegalArgumentException("Не передан один из обязательных параметров");
+        }
+        return val;
+    }
 
-        writer.write("Hello " + myCookie + " " + myCookie2 + "!");
+    private void saveCookies(HttpServletResponse response, String name, String value) {
+        Cookie myCookie = new Cookie(name, URLEncoder.encode(value, StandardCharsets.UTF_8));
+        myCookie.setMaxAge(Math.toIntExact(TimeUnit.DAYS.toSeconds(1)));
+        response.addCookie(myCookie);
     }
 }
